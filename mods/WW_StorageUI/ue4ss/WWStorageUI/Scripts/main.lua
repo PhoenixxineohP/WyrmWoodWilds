@@ -6,7 +6,9 @@
 local TAG = "[WWStorageUI] "
 
 local function say(fmt, ...)
-    pcall(function() print(TAG .. string.format(fmt, ...) .. "\n") end)
+    local ok, msg = pcall(string.format, fmt, ...)
+    local text = TAG .. (ok and msg or tostring(fmt)) .. "\n"
+    pcall(function() print(text) end)
 end
 
 local function valid(obj)
@@ -32,18 +34,20 @@ local function columns_for(n)
 end
 
 local function count_slots(body)
-    local arr = body.InventorySlots
-    if valid(arr) then
-        local ok, n = pcall(function() return arr:GetArrayNum() end)
-        if ok and type(n) == "number" and n > 0 then return n end
-    end
+    -- MaxSlotCount is the authoritative total; InventorySlots may only contain
+    -- widgets for the used slots.
     local api = body.InventoryAPI
     if valid(api) then
         local inv = api.InventoryComponent
         if valid(inv) then
             local ok, n = pcall(function() return inv.MaxSlotCount end)
-            if ok and type(n) == "number" then return n end
+            if ok and type(n) == "number" and n > 0 then return n end
         end
+    end
+    local arr = body.InventorySlots
+    if valid(arr) then
+        local ok, n = pcall(function() return arr:GetArrayNum() end)
+        if ok and type(n) == "number" and n > 0 then return n end
     end
     return 0
 end
@@ -75,8 +79,31 @@ local function layout(body)
     return true, count, cols
 end
 
+-- The vertical navigation SizeBox clamps the panel to 630 px. Widen it so a
+-- 15-16 column grid has room without shrinking the slots.
+local function widen_panel()
+    local ok, list = pcall(FindAllOf, "WBP_WorldActorInventory_VerticalNavigation_C")
+    if not ok or list == nil then return end
+    for _, v in ipairs(list) do
+        if valid(v) then
+            local tree = v.WidgetTree
+            if valid(tree) then
+                local okw, box = pcall(function() return tree:FindWidget(FName("SizeBox_0")) end)
+                if not okw or not valid(box) then
+                    okw, box = pcall(function() return tree:FindWidget("SizeBox_0") end)
+                end
+                if okw and valid(box) then
+                    pcall(function() box:SetWidthOverride(1250.0) end)
+                    pcall(function() box:SetMinDesiredWidth(1250.0) end)
+                end
+            end
+        end
+    end
+end
+
 local reported = {}
 LoopAsync(750, function()
+    widen_panel()
     local ok, bodies = pcall(FindAllOf, "WBP_WorldActorInventory_InventoryBody_C")
     if ok and bodies then
         for _, body in ipairs(bodies) do
