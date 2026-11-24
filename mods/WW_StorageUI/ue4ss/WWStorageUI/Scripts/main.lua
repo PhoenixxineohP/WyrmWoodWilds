@@ -108,30 +108,62 @@ local function layout(body)
     return true, kidCount, cols
 end
 
--- The vertical navigation SizeBox clamps the panel to 630 px. Widen it so a
--- 15-16 column grid has room without shrinking the slots.
-local function widen_panel()
-    local classes = {
-        "WBP_WorldActorInventory_VerticalNavigation_C",
-        "WBP_WorldActorInventory_VerticalNavigation",
-    }
-    for _, cls in ipairs(classes) do
-        local ok, list = pcall(FindAllOf, cls)
-        if ok and list then
+-- The vertical navigation SizeBox clamps the panel to 630 px. Walk up from the
+-- live body (body -> WidgetTree -> VerticalNavigation) and widen both the box
+-- and the on-screen position so 15-16 columns keep their original slot size.
+local widened = {}
+
+local function widen_panel(body)
+    if not valid(body) then return end
+    local tree = body:GetOuter()          -- WidgetTree
+    if not valid(tree) then return end
+    local okw, box = pcall(function() return tree:FindWidget(FName("SizeBox_0")) end)
+    if not okw or not valid(box) then
+        okw, box = pcall(function() return tree:FindWidget("SizeBox_0") end)
+    end
+    if not okw or not valid(box) then
+        -- Fallback: locate a live vertical navigation widget.
+        local okv, list = pcall(FindAllOf, "WBP_WorldActorInventory_VerticalNavigation_C")
+        if okv and list then
             for _, v in ipairs(list) do
-                if valid(v) then
-                    local tree = v.WidgetTree
-                    if valid(tree) then
-                        local okw, box = pcall(function() return tree:FindWidget(FName("SizeBox_0")) end)
-                        if not okw or not valid(box) then
-                            okw, box = pcall(function() return tree:FindWidget("SizeBox_0") end)
-                        end
-                        if okw and valid(box) then
-                            pcall(function() box:SetWidthOverride(1250.0) end)
-                            pcall(function() box:SetMinDesiredWidth(1250.0) end)
-                        end
-                    end
+                if valid(v) and valid(v.WidgetTree) then
+                    local okb, b = pcall(function() return v.WidgetTree:FindWidget(FName("SizeBox_0")) end)
+                    if okb and valid(b) then box = b; okw = true; break end
                 end
+            end
+        end
+    end
+    if okw and valid(box) then
+        pcall(function() box:SetWidthOverride(1250.0) end)
+        pcall(function() box:SetMinDesiredWidth(1250.0) end)
+        pcall(function() box:SetMaxDesiredWidth(1250.0) end)
+        -- Direct assignments cover builds where the setters are no-ops.
+        pcall(function() box.WidthOverride = 1250.0 end)
+        pcall(function() box.bOverride_WidthOverride = true end)
+        local addr = tostring(body:GetAddress())
+        if widened[addr] ~= true then
+            widened[addr] = true
+            local ok, w = pcall(function() return box.WidthOverride end)
+            say("widened panel box=%s width=%s", tostring(valid(box)), tostring(ok and w or "?"))
+        end
+    end
+
+    else
+        local addr = tostring(body:GetAddress())
+        if widened[addr] ~= true then
+            widened[addr] = true
+            say("width box not found")
+        end
+    end
+
+    -- Keep the wider panel on screen.
+    local okm, main = pcall(FindFirstOf, "WBP_WorldActorInventory_MainPanel_C")
+    if okm and valid(main) then
+        local bg = main.BackgroundPanel
+        if valid(bg) then
+            local slot = bg.Slot
+            if valid(slot) then
+                pcall(function() slot:SetPosition({ X = 650.0, Y = 100.0 }) end)
             end
         end
     end
@@ -165,13 +197,13 @@ local reported = {}
 local ticks = 0
 
 local function tick()
-    widen_panel()
     local bodies = find_bodies()
     ticks = ticks + 1
     if ticks <= 3 or (ticks <= 120 and ticks % 20 == 0) then
         say("tick %d bodies=%d", ticks, #bodies)
     end
     for _, body in ipairs(bodies) do
+        widen_panel(body)
         local done, count, cols = layout(body)
         if done then
             local key = tostring(count) .. "x" .. tostring(cols)
