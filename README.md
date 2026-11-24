@@ -12,18 +12,19 @@ without shipping cooked Unreal assets.
 | Feature | Mod folder | Status |
 | --- | --- | --- |
 | Carry capacity x10 (400 → 4000) | `WW_CarryWeight` | ready |
-| Larger storage containers | `WW_Storage` | ready |
+| Larger storage containers (crate 150; chests 128/192/256; personal 256) | `WW_Storage` | ready |
 | Spell cooldown tuning (Rocksplosion → 10s, long spells shortened) | `WW_SpellCooldowns` | ready |
 | Faster fishing node respawns | `WW_RespawnFishing` | ready |
 | Faster rune essence respawns | `WW_RespawnRuneEssence` | ready |
 | Faster anima vent (mana) respawns | `WW_RespawnAnimaVents` | ready |
 | Faster mineral node respawns | `WW_RespawnMinerals` | optional, off by default |
-| Relaxed building stability | `WW_BuildingStability` | ready |
+| Relaxed building stability + tiered integrity | `WW_BuildingStability` | ready |
+| Tiered building HP (T1 x3, T2 x4, T3 x7, T4 x10) | `WW_BuildingDurability` | ready |
 | Farm plots off the ground (build them on floors) | `WW_BuildPlacement` | ready |
 | Higher build height | `WW_BuildHeight` | experimental |
-| Raid pacing / raid pause | — | researched, phase 2 |
-| Wider Humidify / Compost area | — | researched, phase 2 (needs Lua) |
-| Level-scaled runecrafting yields | — | researched, phase 2 (needs runtime hook) |
+| Raid pacing / raid pause (default 25%) | — | phase 2 (runtime) |
+| Wider Humidify / Compost area | — | phase 2 (needs Lua) |
+| Level-scaled runecrafting yields | — | phase 2 (needs runtime hook) |
 | Per-item weight overrides | — | planned (data-only) |
 
 See [`docs/RESEARCH.md`](docs/RESEARCH.md) for the exact assets, rows and values

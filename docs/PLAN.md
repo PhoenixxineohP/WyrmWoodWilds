@@ -23,7 +23,8 @@
 | 5 | `WW_RespawnRuneEssence` | raw loader, same table | Ground/minenode essence returns faster |
 | 6 | `WW_RespawnAnimaVents` | raw loader, same table | `ANIMAVENT_48H` vent returns faster |
 | 7 | `WW_RespawnMinerals` (off) | raw loader, same table | Optional mineral tuning |
-| 8 | `WW_BuildingStability` | raw loader, `DT_StabilityProfile` losses → 0 | High/overhanging pieces place and stay green; no collapse |
+| 8 | `WW_BuildingStability` | raw loader, `DT_StabilityProfile` losses → 0, tiered MaxStability | High/overhanging pieces place and stay green; no collapse |
+| 8b | `WW_BuildingDurability` | blueprint loader, per-piece `HealthComponent.MaxHealth` (T1 x3, T2 x4, T3 x7, T4 x10) | Wall HP matches the tier table in-game |
 | 9 | `WW_BuildPlacement` | raw loader, `DT_PlacementProfile.FarmingPlotProfile.bCanOnlyBePlacedOnGround=false` | Planter places on a built floor |
 | 10 | `WW_BuildHeight` | blueprint loader, `BP_PlayerController.BuildPlacementComponent.MaxHeightModifier` | Can raise build height well above vanilla |
 
