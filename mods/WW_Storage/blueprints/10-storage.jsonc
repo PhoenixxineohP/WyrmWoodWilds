@@ -3,6 +3,7 @@
 // Personal 40, Lumber 48, Ore 48, Fishing rack 4.
 // Policy: the crate is the overflow bin (15x10 grid feel); chests scale up by
 // tier; the personal chest is one-per-player, so it gets full chest space.
+// 208 is the largest count that keeps a 16-column grid at 13 rows on a 1080p screen.
 {
   "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_Crate.BP_BaseBuilding_Crate_C": {
     "BP_Components_WorldItemInventory": {
@@ -24,13 +25,13 @@
   },
   "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_Chest_Iron.BP_BaseBuilding_Chest_Iron_C": {
     "BP_Components_WorldItemInventory": {
-      "MaxSlotCount": 256,
+      "MaxSlotCount": 208,
       "bSupportsSortAndFillStacks": true
     }
   },
   "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_PersonalChest.BP_BaseBuilding_PersonalChest_C": {
     "BP_Components_WorldItemInventory": {
-      "MaxSlotCount": 256,
+      "MaxSlotCount": 208,
       "bSupportsSortAndFillStacks": true
     }
   },

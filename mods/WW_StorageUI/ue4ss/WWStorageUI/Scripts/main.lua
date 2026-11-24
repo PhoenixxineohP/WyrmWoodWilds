@@ -1,0 +1,96 @@
+-- WyrmWoodWilds - world container grid layout.
+-- The vanilla container body is a UniformGridPanel populated with a hard-coded
+-- 8 columns in native code. MaxSlotCount only adds rows, which overflows the
+-- panel. This re-assigns each slot's UniformGridSlot column/row so large
+-- containers use a wide layout that fits on screen.
+local TAG = "[WWStorageUI] "
+
+local function say(fmt, ...)
+    pcall(function() print(TAG .. string.format(fmt, ...) .. "\n") end)
+end
+
+local function valid(obj)
+    if obj == nil then return false end
+    local ok, res = pcall(function() return obj:IsValid() end)
+    return ok and res == true
+end
+
+-- Slot count -> columns. Rows follow automatically.
+-- 150 = 15x10, 128 = 16x8, 192 = 16x12, 208 = 16x13.
+local COLUMNS = {
+    [128] = 16,
+    [150] = 15,
+    [192] = 16,
+    [208] = 16,
+}
+
+local function columns_for(n)
+    local exact = COLUMNS[n]
+    if exact then return exact end
+    if n > 96 then return 16 end
+    return 8
+end
+
+local function count_slots(body)
+    local arr = body.InventorySlots
+    if valid(arr) then
+        local ok, n = pcall(function() return arr:GetArrayNum() end)
+        if ok and type(n) == "number" and n > 0 then return n end
+    end
+    local api = body.InventoryAPI
+    if valid(api) then
+        local inv = api.InventoryComponent
+        if valid(inv) then
+            local ok, n = pcall(function() return inv.MaxSlotCount end)
+            if ok and type(n) == "number" then return n end
+        end
+    end
+    return 0
+end
+
+local function layout(body)
+    if not valid(body) then return false end
+    local grid = body.SlotGridContainer
+    if not valid(grid) then return false end
+
+    local n = count_slots(body)
+    if n <= 0 then return false end
+    local cols = columns_for(n)
+
+    local okChildren, children = pcall(function() return grid:GetChildren() end)
+    if not okChildren or children == nil then return false end
+    local okNum, count = pcall(function() return children:GetArrayNum() end)
+    if not okNum or type(count) ~= "number" or count == 0 then return false end
+
+    for i = 1, count do
+        local child = children[i]
+        if valid(child) then
+            local slot = child.Slot
+            if valid(slot) then
+                pcall(function() slot:SetColumn((i - 1) % cols) end)
+                pcall(function() slot:SetRow(math.floor((i - 1) / cols)) end)
+            end
+        end
+    end
+    return true, count, cols
+end
+
+local reported = {}
+LoopAsync(750, function()
+    local ok, bodies = pcall(FindAllOf, "WBP_WorldActorInventory_InventoryBody_C")
+    if ok and bodies then
+        for _, body in ipairs(bodies) do
+            local done, count, cols = layout(body)
+            if done then
+                local key = tostring(count) .. "x" .. tostring(cols)
+                if reported[key] ~= true then
+                    reported[key] = true
+                    say("relaid %d slots as %d columns (%d rows)", count, cols, math.ceil(count / cols))
+                end
+            end
+        end
+    end
+    return false
+end)
+
+say("loaded")
