@@ -1,0 +1,12 @@
+// WyrmWoodWilds - let farm planters be placed on built surfaces.
+// FarmingPlotProfile is the placement profile used by the planter pieces.
+// Ground-only is the main blocker for "tree house" farming floors.
+{
+  "/Game/Gameplay/BaseBuilding_New/DT_PlacementProfile.DT_PlacementProfile": {
+    "FarmingPlotProfile": {
+      "bCanOnlyBePlacedOnGround": false,
+      "bCanOnlyBePlacedOnDefinedSurface": false,
+      "bCanOnlyBePlacedOnCertainPhysicalSurfaces": false
+    }
+  }
+}

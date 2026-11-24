@@ -1,0 +1,21 @@
+// WyrmWoodWilds - relaxed structural stability.
+// Zeroes the per-step horizontal/vertical stability loss on every profile.
+// Pieces keep their MaxStability instead of decaying, so walls built into
+// terrain and floors far from a foundation stay valid.
+// MinStability/MaxStability are untouched (still used for damage thresholds).
+{
+  "/Game/Gameplay/BaseBuilding_New/DT_StabilityProfile.DT_StabilityProfile": {
+    "Prop":                { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "Stackable_Prop":      { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "Tier1_Foundation":    { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "Tier1_Beam":          { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "Tier1_Base":          { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "Tier2_Foundation":    { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "Tier2_Beam":          { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "Tier2_Base":          { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "Tier3_Foundation":    { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "Tier3_Beam":          { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "Tier3_Base":          { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 },
+    "FarmPlot":            { "VerticalLoss": 0.0, "HorizontalLoss": 0.0 }
+  }
+}

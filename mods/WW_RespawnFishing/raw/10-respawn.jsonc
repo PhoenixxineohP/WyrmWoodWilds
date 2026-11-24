@@ -1,0 +1,12 @@
+// WyrmWoodWilds - faster fishing spot respawns (in-game hours).
+// Vanilla: FISH_NODE_24H = 24h, FISH_NODE_72H = 72h.
+{
+  "/Game/Gameplay/RespawnProfiles/DT_ResourceRespawnSettings.DT_ResourceRespawnSettings": {
+    "FISH_NODE_24H": {
+      "RespawnTime": { "Days": 0, "Hours": 6, "Minutes": 0, "Seconds": 0 }
+    },
+    "FISH_NODE_72H": {
+      "RespawnTime": { "Days": 0, "Hours": 12, "Minutes": 0, "Seconds": 0 }
+    }
+  }
+}

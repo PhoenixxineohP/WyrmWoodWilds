@@ -1,0 +1,12 @@
+// WyrmWoodWilds - faster rune essence respawns (in-game hours).
+// Vanilla: RUNEESSENCE_GROUND_24H = 24h, RUNEESSENCE_MINENODE_48H = 48h.
+{
+  "/Game/Gameplay/RespawnProfiles/DT_ResourceRespawnSettings.DT_ResourceRespawnSettings": {
+    "RUNEESSENCE_GROUND_24H": {
+      "RespawnTime": { "Days": 0, "Hours": 6, "Minutes": 0, "Seconds": 0 }
+    },
+    "RUNEESSENCE_MINENODE_48H": {
+      "RespawnTime": { "Days": 0, "Hours": 8, "Minutes": 0, "Seconds": 0 }
+    }
+  }
+}

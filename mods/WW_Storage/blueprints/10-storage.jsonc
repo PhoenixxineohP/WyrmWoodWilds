@@ -1,0 +1,51 @@
+// WyrmWoodWilds - larger storage.
+// Values are slot counts. Vanilla: Crate 16, Small 32, Chest 48, Iron 64,
+// Personal 40, Lumber 48, Ore 48, Fishing rack 4.
+// Policy: smallest/basic container tripled; every other container doubled.
+{
+  "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_Crate.BP_BaseBuilding_Crate_C": {
+    "BP_Components_WorldItemInventory": {
+      "MaxSlotCount": 48,
+      "bSupportsSortAndFillStacks": true
+    }
+  },
+  "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_Chest_Small.BP_BaseBuilding_Chest_Small_C": {
+    "BP_Components_WorldItemInventory": {
+      "MaxSlotCount": 64,
+      "bSupportsSortAndFillStacks": true
+    }
+  },
+  "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_Chest.BP_BaseBuilding_Chest_C": {
+    "BP_Components_WorldItemInventory": {
+      "MaxSlotCount": 96,
+      "bSupportsSortAndFillStacks": true
+    }
+  },
+  "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_Chest_Iron.BP_BaseBuilding_Chest_Iron_C": {
+    "BP_Components_WorldItemInventory": {
+      "MaxSlotCount": 128,
+      "bSupportsSortAndFillStacks": true
+    }
+  },
+  "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_PersonalChest.BP_BaseBuilding_PersonalChest_C": {
+    "BP_Components_WorldItemInventory": {
+      "MaxSlotCount": 80,
+      "bSupportsSortAndFillStacks": true
+    }
+  },
+  "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_LumberStorage.BP_BaseBuilding_LumberStorage_C": {
+    "BP_Components_WorldItemInventory": {
+      "MaxSlotCount": 96
+    }
+  },
+  "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_OreStorage.BP_BaseBuilding_OreStorage_C": {
+    "BP_Components_WorldItemInventory": {
+      "MaxSlotCount": 96
+    }
+  },
+  "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_FishingRack.BP_BaseBuilding_FishingRack_C": {
+    "BP_Components_WorldItemInventory": {
+      "MaxSlotCount": 8
+    }
+  }
+}

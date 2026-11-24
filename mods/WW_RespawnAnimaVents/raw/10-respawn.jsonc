@@ -1,0 +1,9 @@
+// WyrmWoodWilds - faster anima vent (mana) respawns, in-game hours.
+// Vanilla: ANIMAVENT_48H = 48h.
+{
+  "/Game/Gameplay/RespawnProfiles/DT_ResourceRespawnSettings.DT_ResourceRespawnSettings": {
+    "ANIMAVENT_48H": {
+      "RespawnTime": { "Days": 0, "Hours": 6, "Minutes": 0, "Seconds": 0 }
+    }
+  }
+}

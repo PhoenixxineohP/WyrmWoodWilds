@@ -1,0 +1,12 @@
+// WyrmWoodWilds - higher building placement height.
+// BuildPlacementComponent lives on BP_PlayerController as a default subobject.
+// MaxHeightModifier is a C++ default (not serialized in the asset dump), so this
+// is the one value in the pack whose units are not confirmed. 20000 is intended
+// as 200 m (cm units); lower it if placement behaves oddly.
+{
+  "/Game/Gameplay/Character/Player/BP_PlayerController.BP_PlayerController_C": {
+    "BuildPlacementComponent": {
+      "MaxHeightModifier": 20000.0
+    }
+  }
+}

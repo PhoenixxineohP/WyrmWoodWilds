@@ -1,0 +1,9 @@
+// WyrmWoodWilds - carry capacity x10 (vanilla 400 -> 4000).
+// Uses the native max-carry attribute, so the HUD and encumbrance agree.
+[
+  {
+    "Id": "ww-carry-x10",
+    "PlayerName": "*",
+    "CarryWeightMultiplier": 10.0
+  }
+]

@@ -1,0 +1,23 @@
+// WyrmWoodWilds - optional mineral node respawn tuning (in-game hours).
+// Off by default; enable WW_RespawnMinerals in features.conf.
+// Vanilla: GROUND_12H = 12h, GROUND_24H = 24h, MINENODE_48H = 48h,
+// MINENODE_72H = 72h, BOULDER_NOBED_24H = 24h.
+{
+  "/Game/Gameplay/RespawnProfiles/DT_ResourceRespawnSettings.DT_ResourceRespawnSettings": {
+    "MINERAL_GROUND_12H": {
+      "RespawnTime": { "Days": 0, "Hours": 4, "Minutes": 0, "Seconds": 0 }
+    },
+    "MINERAL_GROUND_24H": {
+      "RespawnTime": { "Days": 0, "Hours": 6, "Minutes": 0, "Seconds": 0 }
+    },
+    "MINERAL_MINENODE_48H": {
+      "RespawnTime": { "Days": 0, "Hours": 8, "Minutes": 0, "Seconds": 0 }
+    },
+    "MINERAL_MINENODE_72H": {
+      "RespawnTime": { "Days": 0, "Hours": 12, "Minutes": 0, "Seconds": 0 }
+    },
+    "MINERAL_BOULDER_NOBED_24H": {
+      "RespawnTime": { "Days": 0, "Hours": 6, "Minutes": 0, "Seconds": 0 }
+    }
+  }
+}
