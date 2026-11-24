@@ -146,8 +146,6 @@ local function widen_panel(body)
             local ok, w = pcall(function() return box.WidthOverride end)
             say("widened panel box=%s width=%s", tostring(valid(box)), tostring(ok and w or "?"))
         end
-    end
-
     else
         local addr = tostring(body:GetAddress())
         if widened[addr] ~= true then
