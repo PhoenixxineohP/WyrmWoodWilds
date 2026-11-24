@@ -37,6 +37,9 @@ fi
 cp -a "$ROOT/vendor/runeschema/RuneSchema" "$RS_TARGET"
 mkdir -p "$RS_TARGET/mods"
 
+# Wine/Proton cannot load UPX-packed DLLs; strip them before launch.
+bash "$ROOT/tools/unpack-dlls.sh" "$RS_TARGET/dlls"
+
 # Enable RuneSchema in UE4SS mods.txt without touching other entries.
 MODS_TXT="$WIN64/ue4ss/Mods/mods.txt"
 touch "$MODS_TXT"
@@ -44,6 +47,20 @@ if grep -qiE '^[[:space:]]*RuneSchema[[:space:]]*:' "$MODS_TXT"; then
   sed -i -E 's/^([[:space:]]*RuneSchema[[:space:]]*:).*/\1 1/' "$MODS_TXT"
 else
   printf '\nRuneSchema : 1\n' >> "$MODS_TXT"
+fi
+
+# Under Proton the UE4SS dwmapi proxy only loads as native. Set the override in
+# the game's prefix when we can find it.
+STEAM_ROOT="${GAME_DIR%%/steamapps/common/*}"
+PREFIX="$STEAM_ROOT/steamapps/compatdata/1374490/pfx"
+if command -v wine >/dev/null 2>&1 && [[ -f "$PREFIX/system.reg" ]]; then
+  if ! pgrep -f "RSDragonwilds-Win64-Shipping" >/dev/null 2>&1; then
+    WINEPREFIX="$PREFIX" WINEDEBUG=-all wine reg add 'HKCU\Software\Wine\DllOverrides' /v dwmapi /d 'native,builtin' /f >/dev/null 2>&1 || true
+    WINEPREFIX="$PREFIX" wineserver -k >/dev/null 2>&1 || true
+    echo "set Wine DLL override: dwmapi = native,builtin"
+  else
+    echo "game is running; skipped the Wine DLL override"
+  fi
 fi
 
 GAME_DIR="$GAME_DIR" bash "$ROOT/tools/sync-mods.sh"

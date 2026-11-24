@@ -37,6 +37,8 @@ this is based on, and [`docs/PLAN.md`](docs/PLAN.md) for the roadmap.
 - **RuneSchema** `0.9.0.1` preview (2026-11-17)
 
 Both are fetched by `tools/fetch-deps.sh` and installed by `tools/install.sh`.
+On Linux/Proton the installer also sets the `dwmapi` DLL override and un-packs
+RuneSchema's UPX-compressed DLLs; see [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md).
 
 > This repo lives on a `noexec` mount, so run the scripts with `bash tools/...`.
 Nothing is vendored in this repo.
