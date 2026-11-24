@@ -3,6 +3,9 @@
 -- 8 columns in native code. MaxSlotCount only adds rows, which overflows the
 -- panel. This re-assigns each slot's UniformGridSlot column/row so large
 -- containers use a wide layout that fits on screen.
+--
+-- UObject access must happen on the game thread. Newer UE4SS exposes
+-- LoopInGameThreadWithDelay; older builds use LoopAsync + ExecuteInGameThread.
 local TAG = "[WWStorageUI] "
 
 local function say(fmt, ...)
@@ -34,8 +37,8 @@ local function columns_for(n)
 end
 
 local function count_slots(body)
-    -- MaxSlotCount is the authoritative total; InventorySlots may only contain
-    -- widgets for the used slots.
+    -- MaxSlotCount is authoritative; InventorySlots may only contain widgets
+    -- for used slots.
     local api = body.InventoryAPI
     if valid(api) then
         local inv = api.InventoryComponent
@@ -55,16 +58,16 @@ end
 local function layout(body)
     if not valid(body) then return false end
     local grid = body.SlotGridContainer
-    if not valid(grid) then return false end
+    if not valid(grid) then return false, "no grid" end
 
     local n = count_slots(body)
-    if n <= 0 then return false end
+    if n <= 0 then return false, "no slot count" end
     local cols = columns_for(n)
 
     local okChildren, children = pcall(function() return grid:GetChildren() end)
-    if not okChildren or children == nil then return false end
+    if not okChildren or children == nil then return false, "no children" end
     local okNum, count = pcall(function() return children:GetArrayNum() end)
-    if not okNum or type(count) ~= "number" or count == 0 then return false end
+    if not okNum or type(count) ~= "number" or count == 0 then return false, "no child count" end
 
     for i = 1, count do
         local child = children[i]
@@ -82,42 +85,94 @@ end
 -- The vertical navigation SizeBox clamps the panel to 630 px. Widen it so a
 -- 15-16 column grid has room without shrinking the slots.
 local function widen_panel()
-    local ok, list = pcall(FindAllOf, "WBP_WorldActorInventory_VerticalNavigation_C")
-    if not ok or list == nil then return end
-    for _, v in ipairs(list) do
-        if valid(v) then
-            local tree = v.WidgetTree
-            if valid(tree) then
-                local okw, box = pcall(function() return tree:FindWidget(FName("SizeBox_0")) end)
-                if not okw or not valid(box) then
-                    okw, box = pcall(function() return tree:FindWidget("SizeBox_0") end)
-                end
-                if okw and valid(box) then
-                    pcall(function() box:SetWidthOverride(1250.0) end)
-                    pcall(function() box:SetMinDesiredWidth(1250.0) end)
+    local classes = {
+        "WBP_WorldActorInventory_VerticalNavigation_C",
+        "WBP_WorldActorInventory_VerticalNavigation",
+    }
+    for _, cls in ipairs(classes) do
+        local ok, list = pcall(FindAllOf, cls)
+        if ok and list then
+            for _, v in ipairs(list) do
+                if valid(v) then
+                    local tree = v.WidgetTree
+                    if valid(tree) then
+                        local okw, box = pcall(function() return tree:FindWidget(FName("SizeBox_0")) end)
+                        if not okw or not valid(box) then
+                            okw, box = pcall(function() return tree:FindWidget("SizeBox_0") end)
+                        end
+                        if okw and valid(box) then
+                            pcall(function() box:SetWidthOverride(1250.0) end)
+                            pcall(function() box:SetMinDesiredWidth(1250.0) end)
+                        end
+                    end
                 end
             end
         end
     end
 end
 
-local reported = {}
-LoopAsync(750, function()
-    widen_panel()
-    local ok, bodies = pcall(FindAllOf, "WBP_WorldActorInventory_InventoryBody_C")
-    if ok and bodies then
-        for _, body in ipairs(bodies) do
-            local done, count, cols = layout(body)
-            if done then
-                local key = tostring(count) .. "x" .. tostring(cols)
-                if reported[key] ~= true then
-                    reported[key] = true
-                    say("relaid %d slots as %d columns (%d rows)", count, cols, math.ceil(count / cols))
+local function find_bodies()
+    local seen, result = {}, {}
+    local classes = {
+        "WBP_WorldActorInventory_InventoryBody_C",
+        "WBP_WorldActorInventory_InventoryBody",
+        "/Game/UI/WorldActorInventory/WBP_WorldActorInventory_InventoryBody.WBP_WorldActorInventory_InventoryBody_C",
+    }
+    for _, cls in ipairs(classes) do
+        local ok, list = pcall(FindAllOf, cls)
+        if ok and list then
+            for _, obj in ipairs(list) do
+                if valid(obj) then
+                    local addr = tostring(obj:GetAddress())
+                    if not seen[addr] then
+                        seen[addr] = true
+                        result[#result + 1] = obj
+                    end
                 end
             end
         end
     end
-    return false
-end)
+    return result
+end
 
-say("loaded")
+local reported = {}
+local ticks = 0
+
+local function tick()
+    widen_panel()
+    local bodies = find_bodies()
+    ticks = ticks + 1
+    if ticks <= 3 or (ticks <= 120 and ticks % 20 == 0) then
+        say("tick %d bodies=%d", ticks, #bodies)
+    end
+    for _, body in ipairs(bodies) do
+        local done, count, cols = layout(body)
+        if done then
+            local key = tostring(count) .. "x" .. tostring(cols)
+            if reported[key] ~= true then
+                reported[key] = true
+                say("relaid %d slots as %d columns (%d rows)", count, cols, math.ceil(count / cols))
+            end
+        elseif ticks <= 3 then
+            say("layout skipped: %s", tostring(cols))
+        end
+    end
+end
+
+if type(LoopInGameThreadWithDelay) == "function" then
+    LoopInGameThreadWithDelay(500, function() pcall(tick) end)
+    say("loaded (game-thread loop)")
+else
+    local busy = false
+    LoopAsync(500, function()
+        if not busy then
+            busy = true
+            ExecuteInGameThread(function()
+                pcall(tick)
+                busy = false
+            end)
+        end
+        return false
+    end)
+    say("loaded (fallback loop)")
+end
