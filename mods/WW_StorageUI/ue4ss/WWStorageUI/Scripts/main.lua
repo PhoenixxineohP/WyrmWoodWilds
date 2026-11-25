@@ -114,6 +114,26 @@ end
 -- reliably from the body, so scan live SizeBox widgets and widen the world one.
 local widened_count = 0
 
+-- 1250 px starting at 700 runs past the right edge. Move the panel container
+-- left and up so the whole grid is on screen.
+local moved = false
+local function move_panel_on_screen()
+    local ok, main = pcall(FindFirstOf, "WBP_WorldActorInventory_MainPanel_C")
+    if not ok or not valid(main) then return end
+    local hb = nil
+    pcall(function() hb = main.HorizontalBox_50 end)
+    if not valid(hb) then
+        pcall(function() hb = main:GetWidgetFromName(FName("HorizontalBox_50")) end)
+    end
+    if valid(hb) and valid(hb.Slot) then
+        pcall(function() hb.Slot:SetPosition({ X = 620.0, Y = 80.0 }) end)
+        if not moved then
+            moved = true
+            say("moved container panel to x=620")
+        end
+    end
+end
+
 local function widen_world_panels()
     -- Preferred: ask the live vertical navigation widget for its SizeBox.
     local okv, vlist = pcall(FindAllOf, "WBP_WorldActorInventory_VerticalNavigation_C")
@@ -141,6 +161,7 @@ local function widen_world_panels()
     if byName > 0 and widened_count ~= byName then
         widened_count = byName
         say("widened %d size box(es) by widget name", byName)
+        move_panel_on_screen()
         return
     end
 
@@ -174,6 +195,7 @@ local function widen_world_panels()
     if changed > 0 and widened_count ~= changed then
         widened_count = changed
         say("widened %d world panel size box(es)", changed)
+        move_panel_on_screen()
     end
 end
 
