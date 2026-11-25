@@ -12,7 +12,7 @@ without shipping cooked Unreal assets.
 | Feature | Mod folder | Status |
 | --- | --- | --- |
 | Carry capacity x10 (400 → 4000) | `WW_CarryWeight` | ready |
-| Larger storage containers (crate 150; chests 128/192/256; personal 256) | `WW_Storage` | ready |
+| Tiered storage: crate 12x9, small 13x10, chest 14x11, iron 15x12, personal 16x13 | `WW_Storage` + `WW_StorageUI` | ready |
 | Spell cooldown tuning (Rocksplosion → 10s, long spells shortened) | `WW_SpellCooldowns` | ready |
 | Faster fishing node respawns | `WW_RespawnFishing` | ready |
 | Faster rune essence respawns | `WW_RespawnRuneEssence` | ready |

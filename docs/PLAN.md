@@ -17,7 +17,7 @@
 | # | Mod | Mechanism | Acceptance test |
 | --- | --- | --- | --- |
 | 1 | `WW_CarryWeight` | players loader, `CarryWeightMultiplier: 10` | HUD limit shows ~4000; can carry 10× before overburden |
-| 2 | `WW_Storage` | blueprint loader, `BP_Components_WorldItemInventory.MaxSlotCount` | New and existing crates/chests open with new slot counts; sorting works |
+| 2 | `WW_Storage` + `WW_StorageUI` | blueprint loader for slot counts; Lua companion for 12–16 column grid + panel width | New and existing crates/chests open with the tiered grid; slots keep normal size |
 | 3 | `WW_SpellCooldowns` | assets loader, `UtilitySpellData.CooldownDuration` | Rocksplosion ready in 10s; listed spells match table |
 | 4 | `WW_RespawnFishing` | raw loader, `DT_ResourceRespawnSettings` rows | Depleted fishing node returns within target hours |
 | 5 | `WW_RespawnRuneEssence` | raw loader, same table | Ground/minenode essence returns faster |

@@ -1,31 +1,33 @@
 // WyrmWoodWilds - larger storage.
 // Values are slot counts. Vanilla: Crate 16, Small 32, Chest 48, Iron 64,
 // Personal 40, Lumber 48, Ore 48, Fishing rack 4.
-// Policy: the crate is the overflow bin (15x10 grid feel); chests scale up by
-// tier; the personal chest is one-per-player, so it gets full chest space.
-// 208 is the largest count that keeps a 16-column grid at 13 rows on a 1080p screen.
+// Policy: one tier = one extra row and column.
+// Crate 12x9, Small 13x10, Chest 14x11, Iron 15x12, Personal 16x13.
+// 16x13 = 208 is the largest grid that fits beside the player panel at normal
+// slot size on a 16:9 screen; UI scales with resolution so the grid is the same
+// at 1440p/4K.
 {
   "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_Crate.BP_BaseBuilding_Crate_C": {
     "BP_Components_WorldItemInventory": {
-      "MaxSlotCount": 150,
+      "MaxSlotCount": 108,
       "bSupportsSortAndFillStacks": true
     }
   },
   "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_Chest_Small.BP_BaseBuilding_Chest_Small_C": {
     "BP_Components_WorldItemInventory": {
-      "MaxSlotCount": 128,
+      "MaxSlotCount": 130,
       "bSupportsSortAndFillStacks": true
     }
   },
   "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_Chest.BP_BaseBuilding_Chest_C": {
     "BP_Components_WorldItemInventory": {
-      "MaxSlotCount": 192,
+      "MaxSlotCount": 154,
       "bSupportsSortAndFillStacks": true
     }
   },
   "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_Chest_Iron.BP_BaseBuilding_Chest_Iron_C": {
     "BP_Components_WorldItemInventory": {
-      "MaxSlotCount": 208,
+      "MaxSlotCount": 180,
       "bSupportsSortAndFillStacks": true
     }
   },
@@ -37,12 +39,12 @@
   },
   "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_LumberStorage.BP_BaseBuilding_LumberStorage_C": {
     "BP_Components_WorldItemInventory": {
-      "MaxSlotCount": 192
+      "MaxSlotCount": 154
     }
   },
   "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_OreStorage.BP_BaseBuilding_OreStorage_C": {
     "BP_Components_WorldItemInventory": {
-      "MaxSlotCount": 192
+      "MaxSlotCount": 154
     }
   },
   "/Game/Gameplay/BaseBuilding/Actors/Props/BP_BaseBuilding_FishingRack.BP_BaseBuilding_FishingRack_C": {

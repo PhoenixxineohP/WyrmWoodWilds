@@ -150,16 +150,22 @@ individual items is data-only and planned.
 
 `BP_Components_WorldItemInventory` on each container; field `MaxSlotCount`:
 
-| Container | Class | Vanilla | Pack |
-| --- | --- | ---: | ---: |
-| Crate | `BP_BaseBuilding_Crate_C` | 16 | 48 (×3) |
-| Small chest | `BP_BaseBuilding_Chest_Small_C` | 32 | 64 |
-| Chest | `BP_BaseBuilding_Chest_C` | 48 | 96 |
-| Iron chest | `BP_BaseBuilding_Chest_Iron_C` | 64 | 128 |
-| Personal chest | `BP_BaseBuilding_PersonalChest_C` | 40 | 80 |
-| Lumber storage | `BP_BaseBuilding_LumberStorage_C` | 48 | 96 |
-| Ore storage | `BP_BaseBuilding_OreStorage_C` | 48 | 96 |
-| Fishing rack | `BP_BaseBuilding_FishingRack_C` | 4 | 8 |
+| Container | Class | Vanilla | Pack | Grid |
+| --- | --- | ---: | ---: | --- |
+| Crate | `BP_BaseBuilding_Crate_C` | 16 | 108 | 12x9 |
+| Small chest | `BP_BaseBuilding_Chest_Small_C` | 32 | 130 | 13x10 |
+| Chest | `BP_BaseBuilding_Chest_C` | 48 | 154 | 14x11 |
+| Iron chest | `BP_BaseBuilding_Chest_Iron_C` | 64 | 180 | 15x12 |
+| Personal chest | `BP_BaseBuilding_PersonalChest_C` | 40 | 208 | 16x13 |
+| Lumber storage | `BP_BaseBuilding_LumberStorage_C` | 48 | 154 | 14x11 |
+| Ore storage | `BP_BaseBuilding_OreStorage_C` | 48 | 154 | 14x11 |
+| Fishing rack | `BP_BaseBuilding_FishingRack_C` | 4 | 16 | 8x2 |
+
+The vanilla container widget is hard-coded to 8 columns (`WorldActorInventoryBodyBase`
++ `UniformGridPanel`), and its `SizeBox` clamps the panel to 630 px. `WW_StorageUI`
+re-columns the live grid and widens that box; 16x13 = 208 is the largest grid that
+fits beside the player panel at normal slot size on 16:9. UI scale follows
+resolution, so the grid is the same at 1440p/4K.
 
 `bSupportsSortAndFillStacks` is already true on some; the pack enables it where
 the component exists.

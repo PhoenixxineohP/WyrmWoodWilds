@@ -23,9 +23,10 @@ end
 -- Slot count -> columns. Rows follow automatically.
 -- 150 = 15x10, 128 = 16x8, 192 = 16x12, 208 = 16x13.
 local COLUMNS = {
-    [128] = 16,
-    [150] = 15,
-    [192] = 16,
+    [108] = 12,
+    [130] = 13,
+    [154] = 14,
+    [180] = 15,
     [208] = 16,
 }
 
@@ -108,62 +109,76 @@ local function layout(body)
     return true, kidCount, cols
 end
 
--- The vertical navigation SizeBox clamps the panel to 630 px. Walk up from the
--- live body (body -> WidgetTree -> VerticalNavigation) and widen both the box
--- and the on-screen position so 15-16 columns keep their original slot size.
+-- The vertical navigation SizeBox clamps the panel to 630 px. It is not in the
+-- body's own widget tree, so walk the outer chain (body -> tree -> parent
+-- widget -> tree -> ...) until a tree exposes SizeBox_0.
 local widened = {}
 
-local function widen_panel(body)
-    if not valid(body) then return end
-    local tree = body:GetOuter()          -- WidgetTree
-    if not valid(tree) then return end
-    local okw, box = pcall(function() return tree:FindWidget(FName("SizeBox_0")) end)
-    if not okw or not valid(box) then
-        okw, box = pcall(function() return tree:FindWidget("SizeBox_0") end)
-    end
-    if not okw or not valid(box) then
-        -- Fallback: locate a live vertical navigation widget.
-        local okv, list = pcall(FindAllOf, "WBP_WorldActorInventory_VerticalNavigation_C")
-        if okv and list then
-            for _, v in ipairs(list) do
-                if valid(v) and valid(v.WidgetTree) then
-                    local okb, b = pcall(function() return v.WidgetTree:FindWidget(FName("SizeBox_0")) end)
-                    if okb and valid(b) then box = b; okw = true; break end
+local function find_box(start)
+    local cur = start
+    for depth = 1, 10 do
+        if not valid(cur) then break end
+        local tree = nil
+        pcall(function() tree = cur.WidgetTree end)
+        if valid(tree) then
+            for _, name in ipairs({ "SizeBox_0", "SizeBox", "RootSizeBox" }) do
+                local ok, box = pcall(function() return tree:FindWidget(FName(name)) end)
+                if not ok then
+                    ok, box = pcall(function() return tree:FindWidget(name) end)
+                end
+                if ok and valid(box) then
+                    return box, depth, name
                 end
             end
         end
+        local nextObj = nil
+        pcall(function() nextObj = cur:GetOuter() end)
+        if not nextObj or nextObj == cur then break end
+        cur = nextObj
     end
-    if okw and valid(box) then
-        pcall(function() box:SetWidthOverride(1250.0) end)
-        pcall(function() box:SetMinDesiredWidth(1250.0) end)
-        pcall(function() box:SetMaxDesiredWidth(1250.0) end)
-        -- Direct assignments cover builds where the setters are no-ops.
-        pcall(function() box.WidthOverride = 1250.0 end)
-        pcall(function() box.bOverride_WidthOverride = true end)
-        local addr = tostring(body:GetAddress())
-        if widened[addr] ~= true then
-            widened[addr] = true
-            local ok, w = pcall(function() return box.WidthOverride end)
-            say("widened panel box=%s width=%s", tostring(valid(box)), tostring(ok and w or "?"))
-        end
-    else
-        local addr = tostring(body:GetAddress())
+    return nil
+end
+
+local function widen_panel(body)
+    if not valid(body) then return end
+
+    local box, depth, name = find_box(body)
+    local addr = tostring(body:GetAddress())
+    if not valid(box) then
         if widened[addr] ~= true then
             widened[addr] = true
             say("width box not found")
         end
+    else
+        pcall(function() box:SetWidthOverride(1250.0) end)
+        pcall(function() box:SetMinDesiredWidth(1250.0) end)
+        pcall(function() box:SetMaxDesiredWidth(1250.0) end)
+        pcall(function() box.WidthOverride = 1250.0 end)
+        pcall(function() box.bOverride_WidthOverride = true end)
+        if widened[addr] ~= true then
+            widened[addr] = true
+            local ok, w = pcall(function() return box.WidthOverride end)
+            say("widened panel via %s at depth %d (width=%s)", tostring(name), depth, tostring(ok and w or "?"))
+        end
     end
 
-    -- Keep the wider panel on screen.
-    local okm, main = pcall(FindFirstOf, "WBP_WorldActorInventory_MainPanel_C")
-    if okm and valid(main) then
-        local bg = main.BackgroundPanel
-        if valid(bg) then
-            local slot = bg.Slot
-            if valid(slot) then
-                pcall(function() slot:SetPosition({ X = 650.0, Y = 100.0 }) end)
+    -- Keep the wider panel on screen. Find the main panel in the same chain.
+    local cur = body
+    for _ = 1, 10 do
+        if not valid(cur) then break end
+        local cls = nil
+        pcall(function() cls = cur:GetClass():GetFName():ToString() end)
+        if cls and string.find(cls, "WorldActorInventory_MainPanel") then
+            local bg = cur.BackgroundPanel
+            if valid(bg) and valid(bg.Slot) then
+                pcall(function() bg.Slot:SetPosition({ X = 650.0, Y = 100.0 }) end)
             end
+            break
         end
+        local nextObj = nil
+        pcall(function() nextObj = cur:GetOuter() end)
+        if not nextObj or nextObj == cur then break end
+        cur = nextObj
     end
 end
 
