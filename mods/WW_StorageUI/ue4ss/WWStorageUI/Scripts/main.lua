@@ -109,77 +109,47 @@ local function layout(body)
     return true, kidCount, cols
 end
 
--- The vertical navigation SizeBox clamps the panel to 630 px. It is not in the
--- body's own widget tree, so walk the outer chain (body -> tree -> parent
--- widget -> tree -> ...) until a tree exposes SizeBox_0.
-local widened = {}
+-- The world inventory panel is clamped by a SizeBox with WidthOverride=630 on
+-- WBP_WorldActorInventory_VerticalNavigation. The property chain is not exposed
+-- reliably from the body, so scan live SizeBox widgets and widen the world one.
+local widened_count = 0
 
-local function find_box(start)
-    local cur = start
-    for depth = 1, 10 do
-        if not valid(cur) then break end
-        local tree = nil
-        pcall(function() tree = cur.WidgetTree end)
-        if valid(tree) then
-            for _, name in ipairs({ "SizeBox_0", "SizeBox", "RootSizeBox" }) do
-                local ok, box = pcall(function() return tree:FindWidget(FName(name)) end)
-                if not ok then
-                    ok, box = pcall(function() return tree:FindWidget(name) end)
+local function widen_world_panels()
+    local ok, list = pcall(FindAllOf, "SizeBox")
+    if not ok or list == nil or #list == 0 then
+        ok, list = pcall(FindAllOf, "/Script/UMG.SizeBox")
+    end
+    if not ok or list == nil then return end
+    local changed = 0
+    for _, sb in ipairs(list) do
+        if valid(sb) then
+            local okw, w = pcall(function() return sb.WidthOverride end)
+            if okw and type(w) == "number" and w >= 600 and w <= 700 then
+                local tree = sb:GetOuter()
+                local owner = nil
+                if valid(tree) then pcall(function() owner = tree:GetOuter() end) end
+                local cls = ""
+                if valid(owner) then
+                    pcall(function() cls = owner:GetClass():GetFName():ToString() end)
                 end
-                if ok and valid(box) then
-                    return box, depth, name
+                if type(cls) == "string" and string.find(cls, "WorldActorInventory_VerticalNavigation") then
+                    pcall(function() sb:SetWidthOverride(1250.0) end)
+                    pcall(function() sb:SetMinDesiredWidth(1250.0) end)
+                    pcall(function() sb.WidthOverride = 1250.0 end)
+                    pcall(function() sb.bOverride_WidthOverride = true end)
+                    changed = changed + 1
                 end
             end
         end
-        local nextObj = nil
-        pcall(function() nextObj = cur:GetOuter() end)
-        if not nextObj or nextObj == cur then break end
-        cur = nextObj
     end
-    return nil
+    if changed > 0 and widened_count ~= changed then
+        widened_count = changed
+        say("widened %d world panel size box(es)", changed)
+    end
 end
 
 local function widen_panel(body)
-    if not valid(body) then return end
-
-    local box, depth, name = find_box(body)
-    local addr = tostring(body:GetAddress())
-    if not valid(box) then
-        if widened[addr] ~= true then
-            widened[addr] = true
-            say("width box not found")
-        end
-    else
-        pcall(function() box:SetWidthOverride(1250.0) end)
-        pcall(function() box:SetMinDesiredWidth(1250.0) end)
-        pcall(function() box:SetMaxDesiredWidth(1250.0) end)
-        pcall(function() box.WidthOverride = 1250.0 end)
-        pcall(function() box.bOverride_WidthOverride = true end)
-        if widened[addr] ~= true then
-            widened[addr] = true
-            local ok, w = pcall(function() return box.WidthOverride end)
-            say("widened panel via %s at depth %d (width=%s)", tostring(name), depth, tostring(ok and w or "?"))
-        end
-    end
-
-    -- Keep the wider panel on screen. Find the main panel in the same chain.
-    local cur = body
-    for _ = 1, 10 do
-        if not valid(cur) then break end
-        local cls = nil
-        pcall(function() cls = cur:GetClass():GetFName():ToString() end)
-        if cls and string.find(cls, "WorldActorInventory_MainPanel") then
-            local bg = cur.BackgroundPanel
-            if valid(bg) and valid(bg.Slot) then
-                pcall(function() bg.Slot:SetPosition({ X = 650.0, Y = 100.0 }) end)
-            end
-            break
-        end
-        local nextObj = nil
-        pcall(function() nextObj = cur:GetOuter() end)
-        if not nextObj or nextObj == cur then break end
-        cur = nextObj
-    end
+    widen_world_panels()
 end
 
 local function find_bodies()
