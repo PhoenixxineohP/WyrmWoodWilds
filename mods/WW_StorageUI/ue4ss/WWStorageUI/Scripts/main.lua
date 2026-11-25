@@ -149,9 +149,9 @@ local function widen_world_panels()
                     okw, box = pcall(function() return v:GetWidgetFromName("SizeBox_0") end)
                 end
                 if okw and valid(box) then
-                    pcall(function() box:SetWidthOverride(1250.0) end)
-                    pcall(function() box:SetMinDesiredWidth(1250.0) end)
-                    pcall(function() box.WidthOverride = 1250.0 end)
+                    pcall(function() box:SetWidthOverride(1170.0) end)
+                    pcall(function() box:SetMinDesiredWidth(1170.0) end)
+                    pcall(function() box.WidthOverride = 1170.0 end)
                     pcall(function() box.bOverride_WidthOverride = true end)
                     byName = byName + 1
                 end
@@ -183,9 +183,9 @@ local function widen_world_panels()
                     pcall(function() cls = owner:GetClass():GetFName():ToString() end)
                 end
                 if type(cls) == "string" and string.find(cls, "WorldActorInventory_VerticalNavigation") then
-                    pcall(function() sb:SetWidthOverride(1250.0) end)
-                    pcall(function() sb:SetMinDesiredWidth(1250.0) end)
-                    pcall(function() sb.WidthOverride = 1250.0 end)
+                    pcall(function() sb:SetWidthOverride(1170.0) end)
+                    pcall(function() sb:SetMinDesiredWidth(1170.0) end)
+                    pcall(function() sb.WidthOverride = 1170.0 end)
                     pcall(function() sb.bOverride_WidthOverride = true end)
                     changed = changed + 1
                 end
