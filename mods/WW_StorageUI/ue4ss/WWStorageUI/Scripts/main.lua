@@ -115,6 +115,35 @@ end
 local widened_count = 0
 
 local function widen_world_panels()
+    -- Preferred: ask the live vertical navigation widget for its SizeBox.
+    local okv, vlist = pcall(FindAllOf, "WBP_WorldActorInventory_VerticalNavigation_C")
+    if not okv or vlist == nil then
+        okv, vlist = pcall(FindAllOf, "WBP_WorldActorInventory_VerticalNavigation")
+    end
+    local byName = 0
+    if okv and vlist then
+        for _, v in ipairs(vlist) do
+            if valid(v) then
+                local okw, box = pcall(function() return v:GetWidgetFromName(FName("SizeBox_0")) end)
+                if not okw or not valid(box) then
+                    okw, box = pcall(function() return v:GetWidgetFromName("SizeBox_0") end)
+                end
+                if okw and valid(box) then
+                    pcall(function() box:SetWidthOverride(1250.0) end)
+                    pcall(function() box:SetMinDesiredWidth(1250.0) end)
+                    pcall(function() box.WidthOverride = 1250.0 end)
+                    pcall(function() box.bOverride_WidthOverride = true end)
+                    byName = byName + 1
+                end
+            end
+        end
+    end
+    if byName > 0 and widened_count ~= byName then
+        widened_count = byName
+        say("widened %d size box(es) by widget name", byName)
+        return
+    end
+
     local ok, list = pcall(FindAllOf, "SizeBox")
     if not ok or list == nil or #list == 0 then
         ok, list = pcall(FindAllOf, "/Script/UMG.SizeBox")
